@@ -1,6 +1,6 @@
 format_version: 10
 pipelines:
-  Expense-tf-apply:
+  GOLDEN-AMI:
     group: Terraform
     materials:
       git-b844969:
@@ -22,7 +22,6 @@ pipelines:
               tasks:
                 - exec: {command: terraform, arguments: [ "init" ], run_if: passed}
                 - exec: {command: terraform, arguments: [ "apply", "-auto-approve" ], run_if: passed}
-
       - DELETE:
           fetch_materials: true
           environment_variables:
