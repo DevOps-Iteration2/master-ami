@@ -1,0 +1,37 @@
+format_version: 10
+pipelines:
+  Expense-tf-apply:
+    group: Terraform
+    materials:
+      git-b844969:
+        git: https://github.com/DevOps-iteration2/master-ami.git
+        shallow_clone: false
+        auto_update: true
+        branch: main
+    secure_variables:
+      TF_VAR_vault_token: AES:IWO2eIk5NdLv3ah3Ubth3Q==:LwHJKINlIGdl/nzBDybgTPDx/4zBQwBNmKqvJJcWY7U=
+    stages:
+      - CREATE:
+          fetch_materials: true
+          environment_variables:
+            env : dev
+          approval:
+            type: manual
+          jobs:
+            terraform-apply:
+              tasks:
+                - exec: {command: terraform, arguments: [ "init" ], run_if: passed}
+                - exec: {command: terraform, arguments: [ "apply", "-auto-approve" ], run_if: passed}
+
+      - DELETE:
+          fetch_materials: true
+          environment_variables:
+            env: dev
+          approval:
+            type: manual
+          jobs:
+            terraform-destroy:
+              tasks:
+                - exec: { command: terraform, arguments: [ "init" ], run_if: passed }
+                - exec: { command: terraform, arguments: [ "state", "rm", "aws_ami_from_instance.ami" ], run_if: passed }
+                - exec: { command: terraform, arguments: [ "destroy", "-auto-approve" ], run_if: passed }
